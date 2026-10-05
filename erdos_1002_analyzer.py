@@ -40,18 +40,15 @@ def evaluate_f(alpha, n):
     return np.sum(terms) / np.log(n)
 
 def get_continued_fraction_alphas(num_samples):
-    # Método baseado nas propriedades diofantinas (números irracionais com frações contínuas específicas, ex: razões áureas e irracionais quadráticos)
-    # Usamos uma base que inclui razões ligadas à sequência de Fibonacci para testar casos extremos de distribuição.
-    base = (np.sqrt(5) - 1) / 2  # Razão áurea (pior caso para equidistribuição)
+    base = (np.sqrt(5) - 1) / 2  # Razão áurea
     alphas = np.linspace(0.001, 0.999, num_samples)
-    # Misturar perturbações baseadas em frações contínuas
     return np.mod(alphas + base, 1.0)
 
 # =========================
 # EXECUÇÃO CONSOANTE O MÉTODO
 # =========================
 if st.button("Executar Método Selecionado"):
-    with st.spinner(ffazendo execução via: {method_choice}...):
+    with st.spinner(f"Fazendo execução via: {method_choice}..."):
         
         if "1." in method_choice:
             alphas = np.linspace(0.001, 0.999, num_alphas)
@@ -63,7 +60,6 @@ if st.button("Executar Método Selecionado"):
             st.success("Varredura Global Concluída.")
             
         elif "2." in method_choice:
-            # Método analítico de frações contínuas / aproximações diofantinas
             alphas = get_continued_fraction_alphas(num_alphas)
             k = np.arange(1, n_max + 1, dtype=np.float64)[:, None]
             ak = k * alphas[None, :]
@@ -73,14 +69,12 @@ if st.button("Executar Método Selecionado"):
             st.success("Análise por Propriedades Diofantinas (Fracções Contínuas) Concluída.")
             
         else:
-            # Otimização Ativa com SciPy
             alphas = np.linspace(0.001, 0.999, num_alphas)
             k = np.arange(1, n_max + 1, dtype=np.float64)[:, None]
             ak = k * alphas[None, :]
             f_matrix = np.cumsum(0.5 - (ak - np.floor(ak)), axis=0) / np.log(np.arange(1, n_max + 1, dtype=np.float64))[:, None]
             final_vals = f_matrix[-1, :]
             
-            # Otimizador de extremos
             obj_min = lambda x: evaluate_f(x[0], n_max)
             obj_max = lambda x: -evaluate_f(x[0], n_max)
             res_min = differential_evolution(obj_min, bounds=[(0.001, 0.999)], seed=42, maxiter=15)
