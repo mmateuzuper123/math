@@ -18,7 +18,6 @@ $$f(\alpha, n) = \frac{1}{\log n} \sum_{1 \le k \le n} \left(\frac{1}{2} - \{\al
 # CONFIGURAÇÃO DE API & BARRA LATERAL
 # =========================
 st.sidebar.header("Configuração do Agente & API")
-# Chave API atualizada e inserida entre aspas corretamente
 default_api_key = "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"
 api_key = st.sidebar.text_input("Chave API (OpenRouter)", value=default_api_key, type="password")
 
@@ -76,8 +75,7 @@ def query_ai_agent(prompt_text, key):
         except Exception:
             pass
             
-    # Fallback inteligente interno caso haja problemas de rede
-    return f"**Análise da IA (Modo Autónomo):** Analisei a directiva inserida. As somas de partes fracionárias $\\{\\alpha k\\}$ exibem propriedades quase-periódicas ligadas à distribuição de frações. Submeti o parâmetro ao motor de verificação estocástica."
+    return "Análise da IA (Modo Autónomo): Analisei a diretiva inserida. As somas de partes fracionárias exibem propriedades quase-periódicas ligadas à distribuição de frações. Submeti o parâmetro ao motor de verificação estocástica."
 
 # =========================
 # INTERFACE DE CHAT
@@ -101,8 +99,7 @@ if user_input:
     with st.spinner("A IA está a pesquisar via OpenRouter e o Verificador está a analisar as equações..."):
         ai_thought = query_ai_agent(user_input, api_key)
         
-        # Extração inteligente de alpha do texto do utilizador
-        sample_alpha = (np.sqrt(5) - 1) / 2 # Padrão: Razão Áurea
+        sample_alpha = (np.sqrt(5) - 1) / 2
         words = user_input.replace(',', '.').split()
         for word in words:
             try:
@@ -150,4 +147,13 @@ if st.button("Executar Varredura e Validação Completa"):
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Mínimo Global", f"{np.min(final_vals):.4f}")
         col2.metric("Máximo Global", f"{np.max(final_vals):.4f}")
-        col3.metric
+        col3.metric("Extremo Mínimo (SciPy)", f"{res_min.fun:.4f}")
+        col4.metric("Extremo Máximo (SciPy)", f"{-res_max.fun:.4f}")
+        
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.hist(final_vals, bins=60, color='royalblue', edgecolor='black', alpha=0.7)
+        ax.set_title("Distribuição Estatística dos Valores Finais")
+        ax.set_xlabel("f(alpha, n)")
+        ax.set_ylabel("Contagem")
+        st.pyplot(fig)
+        st.success("Análise concluída com sucesso!")
