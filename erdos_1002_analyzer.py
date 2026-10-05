@@ -18,8 +18,15 @@ $$f(\alpha, n) = \frac{1}{\log n} \sum_{1 \le k \le n} \left(\frac{1}{2} - \{\al
 # CONFIGURAÇÃO DE API & BARRA LATERAL
 # =========================
 st.sidebar.header("Configuração do Agente & API")
-default_api_key = "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"
-api_key = st.sidebar.text_input("Chave API (OpenRouter)", value=default_api_key, type="password")
+
+# Tenta carregar a chave dos Secrets do Streamlit automaticamente
+secret_key = ""
+try:
+    secret_key = st.secrets.get("OPENROUTER_API_KEY", "")
+except Exception:
+    pass
+
+api_key = st.sidebar.text_input("Chave API (OpenRouter)", value=secret_key, type="password")
 
 n_max = st.sidebar.slider("Comprimento Máximo (n)", min_value=1000, max_value=30000, value=10000, step=1000)
 num_alphas = st.sidebar.slider("Resolução de Alphas", min_value=500, max_value=5000, value=1500, step=500)
@@ -84,7 +91,7 @@ st.subheader("💬 Chat de Investigação Autónoma com IA")
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = [
-        {"role": "assistant", "content": "Olá! Estou conectado através da nova chave OpenRouter. Podes escrever qualquer diretiva ou propor valores de alpha para analisarmos e verificarmos matematicamente."}
+        {"role": "assistant", "content": "Olá! Estou conectado. Podes escrever qualquer diretiva ou propor valores de alpha para analisarmos e verificarmos matematicamente."}
     ]
 
 for msg in st.session_state.chat_history:
